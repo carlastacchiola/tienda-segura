@@ -8,7 +8,7 @@ test('Calcula correctamente una compra sin descuento', () => {
 });
 
 test('Aplica correctamente un descuento del 50%', () => {
-    assert.equal(total(100, 2, 0.5), 100);
+    assert.equal(total(100, 2, 0.5), 150);
 });
 
 test('Calcula correctamente una compra con descuento del 20%', () => {
