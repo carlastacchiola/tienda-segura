@@ -3,13 +3,42 @@ name: pipeline
 
 on: [pull_request]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   verificar:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Descargar el código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - run: npm ci
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
 
-      - run: npm test
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm test
+
+      - name: Analizar dependencias con npm audit
+        run: npm audit --audit-level=high
+
+      - name: Instalar Semgrep
+        run: pip install semgrep
+
+      - name: Analizar código con Semgrep
+        run: semgrep scan --config auto --error
+
+      - name: Detectar secretos con Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
