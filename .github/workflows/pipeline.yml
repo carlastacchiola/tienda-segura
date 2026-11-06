@@ -42,6 +42,25 @@ jobs:
         uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Iniciar aplicación para análisis dinámico
+        run: |
+          node app.js &
+          for i in $(seq 1 20); do
+            if curl -fsS http://localhost:3000/salud; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+
+      - name: Analizar aplicación con OWASP ZAP
+        run: |
+          docker run --rm --network host \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+            -t http://localhost:3000 \
+            -I
 
       - name: Analizar Dockerfile con Trivy
         run: |
