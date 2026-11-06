@@ -61,3 +61,12 @@ jobs:
             zap-baseline.py \
             -t http://localhost:3000 \
             -I
+
+      - name: Analizar Dockerfile con Trivy
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace:ro" \
+            aquasec/trivy:latest \
+            config --exit-code 1 \
+            --severity HIGH,CRITICAL \
+            /workspace/Dockerfile
