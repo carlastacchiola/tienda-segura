@@ -42,3 +42,12 @@ jobs:
         uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Analizar Dockerfile con Trivy
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace:ro" \
+            aquasec/trivy:latest \
+            config --exit-code 1 \
+            --severity HIGH,CRITICAL \
+            /workspace/Dockerfile
